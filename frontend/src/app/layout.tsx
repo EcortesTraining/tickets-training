@@ -1,10 +1,8 @@
-import type { Metadata } from 'next'
 import './globals.css'
+import ThemeRegistry from './ThemeRegistry'
+import { createMetadata } from '@/lib/metadata'
 
-export const metadata: Metadata = {
-  title: 'Tickets Training',
-  description: 'Aplicación de entrenamiento de tickets',
-}
+export const metadata = createMetadata('Tickets Training', 'Tickets Training Application')
 
 export default function RootLayout({
   children,
@@ -13,7 +11,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body>{children}</body>
+      <body>
+        <ThemeRegistry>{children}</ThemeRegistry>
+      </body>
     </html>
   )
 }
