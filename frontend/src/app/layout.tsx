@@ -1,19 +1,25 @@
-import './globals.css'
-import ThemeRegistry from './ThemeRegistry'
-import { createMetadata } from '@/lib/metadata'
+import "./globals.css";
+import StoreProvider from "@/store/provider";
+import ThemeRegistry from "./ThemeRegistry";
+import { createMetadata } from "@/lib/metadata";
 
-export const metadata = createMetadata('Tickets Training', 'Tickets Training Application')
+export const metadata = createMetadata(
+  "Tickets Training",
+  "Tickets Training Application",
+);
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="es">
       <body>
-        <ThemeRegistry>{children}</ThemeRegistry>
+        <StoreProvider>
+          <ThemeRegistry>{children}</ThemeRegistry>
+        </StoreProvider>
       </body>
     </html>
-  )
+  );
 }

@@ -1,7 +1,6 @@
+import { redirect } from "next/navigation";
+import { ROUTES } from "@/constants/routes";
+
 export default function Home() {
-  return (
-    <main>
-      <h1>Bienvenido a Tickets Training</h1>
-    </main>
-  )
+  redirect(ROUTES.LOGIN);
 }
