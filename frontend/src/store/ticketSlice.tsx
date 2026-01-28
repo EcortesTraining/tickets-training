@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
 import { SLICES_NAMES } from "./constants";
 
 export interface Ticket {
@@ -38,9 +39,17 @@ export const ticketsSlice = createSlice({
     clearTickets: (state) => {
       state.tickets = [];
     },
+    setTicket: (state, action: PayloadAction<Ticket | undefined>) => {
+      state.ticket = action.payload;
+    },
   },
 });
 
-export const { addTicket, removeTicket, updateTicket, clearTickets } =
-  ticketsSlice.actions;
+export const {
+  addTicket,
+  removeTicket,
+  updateTicket,
+  clearTickets,
+  setTicket,
+} = ticketsSlice.actions;
 export default ticketsSlice.reducer;

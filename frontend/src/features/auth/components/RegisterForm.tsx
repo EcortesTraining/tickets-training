@@ -12,14 +12,22 @@ import {
 import NextLink from "next/link";
 import { loginPaperStyles, loginButtonStyles } from "../styles";
 import { useState } from "react";
+import { ROUTES } from "@/constants/routes";
+import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { register } from "@/store/authSlice";
 
 export default function RegisterForm({}) {
+  const router = useRouter();
+  const dispatch = useDispatch();
   const isLoading = false;
   const [passwordError, setPasswordError] = useState("");
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    const name = (formData.get("name") as string) || "";
+    const email = (formData.get("email") as string) || "";
     const password = formData.get("password") as string;
     const confirmPassword = formData.get("confirmPassword") as string;
 
@@ -29,12 +37,17 @@ export default function RegisterForm({}) {
     }
 
     setPasswordError("");
-    console.log({
-      name: formData.get("name") as string,
-      email: formData.get("email") as string,
-      password,
-      confirmPassword,
-    });
+
+    // Simular registro: guardar usuario en Redux y redirigir al dashboard
+    dispatch(
+      register({
+        id: "1",
+        name: name || email.split("@")[0] || "User",
+        email,
+      }),
+    );
+
+    router.push(ROUTES.DASHBOARD);
   };
 
   return (

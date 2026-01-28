@@ -10,17 +10,32 @@ import {
   Link,
 } from "@mui/material";
 import NextLink from "next/link";
+import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
 import { loginPaperStyles, loginButtonStyles } from "../styles";
+import { ROUTES } from "@/constants/routes";
+import { login } from "@/store/authSlice";
 
 export default function LoginForm({}) {
+  const router = useRouter();
+  const dispatch = useDispatch();
   const isLoading = false;
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     const formData = new FormData(e.currentTarget);
-    console.log({
-      email: formData.get("email") as string,
-      password: formData.get("password") as string,
-    });
+    const email = (formData.get("email") as string) || "";
+
+    dispatch(
+      login({
+        id: "1",
+        name: email.split("@")[0] || "User",
+        email,
+      }),
+    );
+
+    router.push(ROUTES.DASHBOARD);
   };
 
   return (

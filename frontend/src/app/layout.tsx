@@ -3,10 +3,12 @@ import StoreProvider from "@/store/provider";
 import ThemeRegistry from "./ThemeRegistry";
 import { createMetadata } from "@/lib/metadata";
 
-export const metadata = createMetadata(
-  "Tickets Training",
-  "Tickets Training Application",
-);
+export const metadata = {
+  ...createMetadata("Tickets Training", "Tickets Training Application"),
+  icons: {
+    icon: "/images/logo.ico",
+  },
+};
 
 export default function RootLayout({
   children,
