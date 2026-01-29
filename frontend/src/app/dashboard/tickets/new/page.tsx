@@ -13,22 +13,21 @@ import {
   MenuItem,
   Alert,
 } from "@mui/material";
-import { addTicket } from "@/store/ticketSlice";
 import { ROUTES } from "@/constants/routes";
-import type { Ticket } from "@/store/ticketSlice";
+import { addTicket } from "@/store/ticketSlice";
+import { useCreateTicketMutation } from "@/store/api/ticketsApi";
 import type { RootState } from "@/store/store";
 
 export default function ReportTicketPage() {
   const router = useRouter();
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [createTicket, { isLoading }] = useCreateTicketMutation();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
-    setIsSubmitting(true);
 
     try {
       const formData = new FormData(e.currentTarget);
@@ -38,25 +37,24 @@ export default function ReportTicketPage() {
 
       if (!subject || !comments || !priority) {
         setError("Por favor completa todos los campos requeridos");
-        setIsSubmitting(false);
         return;
       }
 
-      const newTicket: Ticket = {
-        id: Date.now().toString(),
+      const apiTicket = await createTicket({
         user: user?.email || "unknown",
         priority,
         status: "open",
         subject,
         comments,
         files: [],
-      };
+      }).unwrap();
 
-      dispatch(addTicket(newTicket));
+      // Mantener sincronizado el slice local de tickets
+      dispatch(addTicket(apiTicket));
+
       router.push(ROUTES.MY_TICKETS);
     } catch (err) {
       setError("Error al crear el ticket. Por favor intenta nuevamente.");
-      setIsSubmitting(false);
     }
   };
 
@@ -82,7 +80,7 @@ export default function ReportTicketPage() {
               required
               variant="outlined"
               placeholder="Describe brevemente el problema"
-              disabled={isSubmitting}
+              disabled={isLoading}
             />
 
             <TextField
@@ -93,7 +91,7 @@ export default function ReportTicketPage() {
               required
               variant="outlined"
               defaultValue="medium"
-              disabled={isSubmitting}
+              disabled={isLoading}
             >
               <MenuItem value="low">Baja</MenuItem>
               <MenuItem value="medium">Media</MenuItem>
@@ -109,14 +107,14 @@ export default function ReportTicketPage() {
               rows={6}
               variant="outlined"
               placeholder="Describe el problema en detalle..."
-              disabled={isSubmitting}
+              disabled={isLoading}
             />
 
             <Stack direction="row" spacing={2} justifyContent="flex-end">
               <Button
                 variant="outlined"
                 onClick={() => router.back()}
-                disabled={isSubmitting}
+                disabled={isLoading}
               >
                 Cancelar
               </Button>
@@ -124,9 +122,9 @@ export default function ReportTicketPage() {
                 type="submit"
                 variant="contained"
                 size="large"
-                disabled={isSubmitting}
+                disabled={isLoading}
               >
-                {isSubmitting ? "Creando..." : "Crear Ticket"}
+                {isLoading ? "Creando..." : "Crear Ticket"}
               </Button>
             </Stack>
           </Stack>
