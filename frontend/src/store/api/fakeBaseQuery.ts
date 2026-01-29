@@ -2,7 +2,7 @@ import type { BaseQueryFn } from "@reduxjs/toolkit/query";
 
 type FakeArgs = {
   url: string;
-  method?: "GET" | "POST";
+  method?: "GET" | "POST" | "DELETE" | "PUT";
   body?: any;
 };
 
@@ -11,21 +11,17 @@ export const fakeBaseQuery =
   async ({ url, method = "GET", body }) => {
     await new Promise((res) => setTimeout(res, 400));
 
-    if (url === "/login" && method === "POST") {
-      const user = {
-        id: "1",
-        name: body.email.split("@")[0],
-        email: body.email,
-      };
-
-      localStorage.setItem("user", JSON.stringify(user));
-
-      return { data: { token: "fake-token", user } };
-    }
-
     if (url === "/tickets" && method === "GET") {
       const tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
       return { data: tickets };
+    }
+
+    if (url.startsWith("/tickets/") && method === "GET") {
+      const id = url.replace("/tickets/", "");
+      const tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
+      const ticket = tickets.find((t: { id: string }) => t.id === id);
+      if (!ticket) return { error: { status: 404, data: "Not found" } };
+      return { data: ticket };
     }
 
     if (url === "/tickets" && method === "POST") {
@@ -41,6 +37,34 @@ export const fakeBaseQuery =
       localStorage.setItem("tickets", JSON.stringify(tickets));
 
       return { data: newTicket };
+    }
+
+    if (url.startsWith("/tickets/") && method === "PUT") {
+      const id = url.replace("/tickets/", "");
+      const tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
+      const index = tickets.findIndex((t: { id: string }) => t.id === id);
+      if (index === -1) return { error: { status: 404, data: "Not found" } };
+
+      const updatedTicket = {
+        ...tickets[index],
+        ...body,
+        id,
+      };
+
+      tickets[index] = updatedTicket;
+      localStorage.setItem("tickets", JSON.stringify(tickets));
+
+      return { data: updatedTicket };
+    }
+
+    if (url.startsWith("/tickets/") && method === "DELETE") {
+      const id = url.replace("/tickets/", "");
+      const tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
+      const nextTickets = tickets.filter((t: { id: string }) => t.id !== id);
+
+      localStorage.setItem("tickets", JSON.stringify(nextTickets));
+
+      return { data: { id } };
     }
 
     return {
